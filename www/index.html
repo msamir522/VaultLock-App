@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VaultLock</title>
+<style>
+:root{--pg:#E9ECF1;--pgt:#1b2230;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--pg:#05070D;--pgt:#C9D0DC}}
+:root[data-theme="dark"]{--pg:#05070D;--pgt:#C9D0DC}
+html,body{margin:0;background:var(--pg);color:var(--pgt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 12px}
+.note{max-width:380px;text-align:center;font-size:13px;line-height:1.45;opacity:.8}
+.phone{--bg:#0A0A12;--sf:#14141F;--sf2:#1E1E30;--ln:#2A2A40;--tx:#F3F3FB;--mu:#8D8DAA;--bad:#FF6B7A;--on:#0A0A12;--ac:#8B7BFF;
+width:360px;max-width:100%;height:700px;background:radial-gradient(120% 55% at 50% 0%,color-mix(in srgb,var(--ac) 16%,transparent),transparent 65%),var(--bg);border-radius:34px;border:8px solid #000;box-shadow:0 20px 50px #0006;overflow:hidden;position:relative;color:var(--tx);display:flex;flex-direction:column;transition:background .25s}
+.phone[data-th=light]{--bg:#F7F6FC;--sf:#FFFFFF;--sf2:#EFEDF9;--ln:#E4E1F1;--tx:#17162A;--mu:#6E6C8C;--bad:#D6334A;--on:#FFFFFF;border-color:#222}
+.sb{height:26px;font-size:11px;display:flex;justify-content:space-between;padding:8px 20px 0;color:var(--mu)}
+#scr{flex:1;overflow-y:auto;padding:12px 18px 90px;display:flex;flex-direction:column;gap:12px}
+h1{font-size:24px;margin:0}h2{font-size:17px;margin:0}
+.mu{color:var(--mu);font-size:13px;line-height:1.4}
+.logo{width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 30%,var(--sf)),var(--sf));box-shadow:0 8px 24px color-mix(in srgb,var(--ac) 25%,transparent);display:grid;place-items:center;font-size:34px;margin:30px auto 6px;border:1px solid var(--ln)}
+input[type=text],input[type=password],textarea,select{width:100%;box-sizing:border-box;background:var(--sf);border:1px solid var(--ln);color:var(--tx);border-radius:12px;padding:12px;font:inherit;font-size:15px}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--ac);outline-offset:-1px}
+label{font-size:12px;color:var(--mu);display:block;margin:2px 0 4px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 14px;font-weight:600;font-size:14px}
+.pri{background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 72%,#4f8cff));color:var(--on);box-shadow:0 4px 14px color-mix(in srgb,var(--ac) 35%,transparent)}.sec{background:var(--sf2);color:var(--tx);border:1px solid var(--ln)}
+.ico{background:none;color:var(--ac);padding:6px 8px;font-size:15px}
+.row{display:flex;gap:8px;align-items:center}.sp{justify-content:space-between}
+.meter{display:flex;gap:4px;align-items:center;font-size:12px}.meter i{flex:1;height:5px;border-radius:3px;background:var(--ln)}
+.err{color:var(--bad);font-size:13px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:12px 14px;box-shadow:0 2px 10px #0000000d}
+.item{display:flex;gap:12px;align-items:center;cursor:pointer}
+.av{width:40px;height:40px;border-radius:12px;background:color-mix(in srgb,var(--ac) 16%,var(--sf2));display:grid;place-items:center;color:var(--ac);font-weight:700;font-size:18px}
+.item b{display:block;font-size:15px}.grow{flex:1;min-width:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fold{cursor:pointer;display:flex;flex-direction:column;gap:6px}.fold .av{width:36px;height:36px}.fold b{font-size:14px}
+.crumb{font-size:12px;color:var(--mu)}
+.kv{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--ln)}.kv:last-child{border:0}
+.kv span.v{font-family:ui-monospace,Menlo,monospace;font-size:14px;word-break:break-all}
+.opt{display:flex;justify-content:space-between;font-size:14px;padding:5px 0}
+input[type=range]{width:100%;accent-color:var(--ac)}input[type=checkbox]{accent-color:var(--ac);width:18px;height:18px}
+.fab{position:absolute;right:20px;bottom:22px;width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 72%,#4f8cff));color:var(--on);font-size:28px;padding:0;box-shadow:0 8px 20px color-mix(in srgb,var(--ac) 40%,transparent)}
+.menu{position:absolute;right:20px;bottom:86px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.menu button{box-shadow:0 4px 12px #0004}
+.seg{display:flex;background:var(--sf2);border-radius:12px;padding:3px}.seg button{flex:1;background:none;color:var(--mu);padding:9px}.seg button.on{background:var(--ac);color:var(--on)}
+.sw{display:flex;gap:12px}.sw button{width:38px;height:38px;border-radius:50%;padding:0;border:3px solid transparent}.sw button.on{border-color:var(--tx)}
+.ic{display:flex;flex-wrap:wrap;gap:6px}.ic button{width:42px;height:42px;padding:0;font-size:20px;background:var(--sf2);border:2px solid transparent}.ic button.on{border-color:var(--ac)}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:8px 14px;border-radius:20px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap}.toast.on{opacity:1}
+.phone,.card,input,select,textarea,button{transition:background-color .3s,color .3s,border-color .3s,transform .18s,box-shadow .25s}
+@keyframes in{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.7)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes spin{from{transform:rotate(-120deg) scale(.5)}to{transform:none}}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+#scr:not(.still)>*:not(.fab):not(.menu){animation:in .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*55ms)}
+#scr:not(.still) .meter i[style]{animation:grow .5s .1s both;transform-origin:left}
+.menu button{animation:pop .3s cubic-bezier(.2,.9,.3,1.3) both}.menu button:nth-child(2){animation-delay:.07s}
+.fab span{display:inline-block;animation:spin .3s}
+.err:not(:empty){animation:shake .35s !important}
+button:active{transform:scale(.94)}
+.card.item:hover,.fold:hover{border-color:var(--ac);transform:translateY(-2px);box-shadow:0 8px 20px color-mix(in srgb,var(--ac) 18%,transparent)}
+.card.item:active,.fold:active{transform:scale(.97)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.wrap{padding:0;gap:0}.phone{width:100%;max-width:none;height:100vh;height:100dvh;border:0;border-radius:0;box-shadow:none}.sb{display:none}#scr{padding-top:calc(16px + env(safe-area-inset-top,0px))}
+</style></head><body>
+<div class="wrap">
+<div class="phone" id="ph"><div class="sb"><span>9:41</span><span>▲ ● ▮</span></div><div id="scr"></div><div class="toast" id="t"></div></div>
+</div>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ACC={Violet:["#8B7BFF","#6D4AFF"],Ocean:["#4FB3FF","#1D7FE0"],Mint:["#3DDC97","#119E68"],Coral:["#FF7A6B","#E5483A"],Gold:["#F5C451","#B98308"]};
+const ICONS=["📁","👥","💼","💰","🏠","🛒","🎮","✉️","📘","📸","🐦","🎵","🛠","🎓","✈️","🏥"];
+let S={pw:null,scr:"setup",cur:0,sel:null,show:false,q:"",menu:false,mode:"system",acc:"Violet",fe:null,
+FL:[],items:[]};
+const LV=["Empty","Weak","Fair","Good","Strong"],COL=["","#E5645A","#E2A54A","#9BC265","#34C38F"];
+const kids=p=>S.FL.filter(f=>f.p==p),fo=id=>S.FL.find(f=>f.id==id);
+const desc=id=>[id,...kids(id).flatMap(k=>desc(k.id))];
+const count=id=>S.items.filter(i=>desc(id).includes(i.fid)).length;
+const path=id=>id?(path(fo(id).p)?path(fo(id).p)+" › ":"")+fo(id).name:"";
+function rate(p){if(!p)return 0;const c=[/[a-z]/,/[A-Z]/,/\d/,/[^A-Za-z0-9]/].filter(r=>r.test(p)).length;if(p.length<10||c<2)return 1;if(c>=4&&p.length>=14)return 4;if(c>=3&&p.length>=12)return 3;return 2}
+function reject(p,c){if(p!==c)return"Passwords do not match.";if(rate(p)==1)return"Use at least 10 characters and mix two kinds: letters, numbers, or symbols.";return null}
+function meter(p){const r=rate(p);return `<div class="meter">${[1,2,3,4].map(i=>`<i style="${i<=r?"background:"+COL[r]:""}"></i>`).join("")}<span style="color:${COL[r]||"var(--mu)"};width:52px;text-align:right">${LV[r]}</span></div>`}
+function gen(o){const P=[];if(o.lower)P.push(o.amb?"abcdefghijkmnopqrstuvwxyz":"abcdefghijklmnopqrstuvwxyz");if(o.upper)P.push(o.amb?"ABCDEFGHJKLMNPQRSTUVWXYZ":"ABCDEFGHIJKLMNOPQRSTUVWXYZ");if(o.digits)P.push(o.amb?"23456789":"0123456789");if(o.symbols)P.push("!@#$%^&*-_=+?");if(!P.length)return null;
+const n=Math.max(Math.min(Math.max(o.len,8),64),P.length),r=m=>crypto.getRandomValues(new Uint32Array(1))[0]%m,ch=P.map(p=>p[r(p.length)]),all=P.join("");while(ch.length<n)ch.push(all[r(all.length)]);for(let i=ch.length-1;i>0;i--){const j=r(i+1);[ch[i],ch[j]]=[ch[j],ch[i]]}return ch.join("")}
+function toast(m){const t=$("#t");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),1500)}
+const mq=matchMedia("(prefers-color-scheme: dark)");mq.addEventListener&&mq.addEventListener("change",theme);
+function theme(){const th=S.mode=="system"?(mq.matches?"dark":"light"):S.mode,ph=$("#ph"),a=ACC[S.acc];ph.dataset.th=th;ph.style.setProperty("--ac",th=="dark"?a[0]:a[1]);
+const r=document.documentElement;S.mode=="system"?r.removeAttribute("data-theme"):r.dataset.theme=S.mode;try{localStorage.vl_prefs=JSON.stringify({mode:S.mode,acc:S.acc})}catch(e){}}
+function flip(){S.mode=$("#ph").dataset.th=="dark"?"light":"dark";theme();render()}
+function go(s,x){S.scr=s;S.show=false;S.menu=false;if(x!==undefined)S.sel=x;persist();render()}
+function open_(id){S.cur=id;S.q="";go("browse")}
+function up(){S.cur=fo(S.cur).p;go("browse")}
+function copy(v,l){try{navigator.clipboard.writeText(v)}catch(e){}clearTimeout(S.cc);S.cc=setTimeout(()=>{try{navigator.clipboard.writeText(" ")}catch(e){}},30000);toast(l+" copied (clears in 30s)")}
+function row(i,showPath){return `<div class="card item" onclick="go('detail',${i.id})"><div class="av">${esc(i.title[0])}</div><div class="grow"><b>${esc(i.title)}</b><span class="mu">${esc(showPath?path(i.fid):i.username)}</span></div><span style="width:9px;height:9px;border-radius:5px;background:${COL[rate(i.password)]}"></span></div>`}
+function render(){const el=$("#scr"),sig=S.scr+"|"+S.cur+"|"+S.sel+"|"+(S.fe&&S.fe.id),still=sig===S.sig;S.sig=sig;el.classList.toggle("still",still);clearTimeout(S.tm);if(!still)S.tm=setTimeout(()=>el.classList.add("still"),1000);const dark=$("#ph").dataset.th=="dark";let h="";
+if(S.scr=="setup")h=`<div class="logo">🔒</div><h1 style="text-align:center">Create your vault</h1><p class="mu" style="text-align:center;margin:0">Your master password encrypts everything on this device. It can’t be recovered if you forget it.</p>
+<div><label>Master password</label><input type="password" id="p1" oninput="$('#m').innerHTML=meter(this.value)"></div><div id="m">${meter("")}</div>
+<div><label>Confirm password</label><input type="password" id="p2"></div><div class="err" id="e"></div><button class="pri" onclick="setup()">Create vault</button>`;
+else if(S.scr=="unlock")h=`<div class="logo">🔒</div><h1 style="text-align:center">VaultLock</h1><p class="mu" style="text-align:center;margin:0">Vault is locked</p>
+<div><label>Master password</label><input type="password" id="p1" onkeydown="if(event.key=='Enter')unlock()"></div><div class="err" id="e"></div><button class="pri" onclick="unlock()">Unlock</button>`;
+else if(S.scr=="browse"){const c=S.cur?fo(S.cur):null,q=S.q.toLowerCase(),f=S.items.filter(i=>(i.title+i.username+path(i.fid)).toLowerCase().includes(q));
+h=`<div class="row sp"><div class="row">${c?`<button class="ico" onclick="up()">←</button>`:""}<h1>${c?c.icon+" "+esc(c.name):"Vaults"}</h1></div><div class="row"><button class="ico" onclick="flip()">${dark?"☀️":"🌙"}</button><button class="ico" onclick="go('settings')">⚙</button>${c?`<button class="ico" onclick="editF(${c.id})">✎</button>`:`<button class="ico" onclick="lock()">🔒</button>`}</div></div>
+${c?`<div class="crumb">Vaults › ${esc(path(c.id))}</div>`:""}
+<input type="text" id="sq" placeholder="Search all accounts" value="${esc(S.q)}" oninput="S.q=this.value;render();const i=$('#sq');i.focus();i.setSelectionRange(99,99)">`;
+if(q)h+=f.map(i=>row(i,1)).join("")||'<p class="mu" style="text-align:center">No matches</p>';
+else{const k=kids(S.cur),l=S.items.filter(i=>i.fid==S.cur);
+if(k.length)h+=`<div class="mu">${c?"Sub-vaults":"Your vaults"}</div><div class="grid">${k.map(x=>`<div class="card fold" onclick="open_(${x.id})"><div class="av">${x.icon}</div><b>${esc(x.name)}</b><span class="mu">${count(x.id)} accounts${kids(x.id).length?" · "+kids(x.id).length+" sub":""}</span></div>`).join("")}</div>`;
+if(c)h+=`<div class="mu">Accounts</div>`+l.map(i=>row(i)).join("")+`<button class="sec" onclick="go('edit',0)">＋ Add account</button>`;
+if(!k.length&&!l.length)h+=`<p class="mu" style="text-align:center;margin-top:30px">Nothing here yet.<br>Tap + to add an account or sub-vault.</p>`}
+h+=(S.menu?`<div class="menu"><button class="pri" onclick="newF()">${S.cur?"📁 New sub-vault":"📁 New vault"}</button><button class="pri" onclick="go('edit',0)">🔑 New account</button></div>`:"")+`<button class="fab" onclick="S.menu=!S.menu;render()"><span>${S.menu?"×":"+"}</span></button>`}
+else if(S.scr=="detail"){const i=S.items.find(x=>x.id==S.sel);h=`<div class="row sp"><button class="ico" onclick="S.cur=${i.fid};go('browse')">← Back</button><button class="ico" onclick="go('edit',${i.id})">Edit</button></div>
+<div class="row"><div class="av" style="width:52px;height:52px;font-size:22px">${esc(i.title[0])}</div><div><h1 style="font-size:20px">${esc(i.title)}</h1><span class="crumb">${esc(path(i.fid))}</span></div></div>
+<div class="card"><div class="kv"><div><label>Username</label><span class="v">${esc(i.username)}</span></div><button class="ico" data-c="${esc(i.username)}" onclick="copy(this.dataset.c,'Username')">Copy</button></div>
+<div class="kv"><div class="grow"><label>Password</label><span class="v">${S.show?esc(i.password):"•".repeat(12)}</span></div><button class="ico" onclick="S.show=!S.show;render()">${S.show?"Hide":"Show"}</button><button class="ico" data-c="${esc(i.password)}" onclick="copy(this.dataset.c,'Password')">Copy</button></div>
+<div style="padding-top:8px">${meter(i.password)}</div></div>
+${i.website?`<div class="card kv"><div><label>Website</label><span class="v">${esc(i.website)}</span></div><button class="ico" onclick="toast('Opens in browser')">Open</button></div>`:""}
+${i.notes?`<div class="card"><label>Notes</label>${esc(i.notes)}</div>`:""}
+<button class="sec" style="color:var(--bad)" onclick="S.cur=${i.fid};S.items=S.items.filter(x=>x.id!=${i.id});go('browse')">Delete account</button>`}
+else if(S.scr=="edit"){const i=S.items.find(x=>x.id==S.sel)||{fid:S.cur||S.FL[0].id,title:"",username:"",password:"",website:"",notes:""};h=`<div class="row sp"><button class="ico" onclick="go(S.sel?'detail':'browse')">✕ Cancel</button><h2>${S.sel?"Edit":"New"} account</h2><button class="ico" onclick="save()">Save</button></div>
+<div><label>Vault</label><select id="f0">${S.FL.map(f=>`<option value="${f.id}" ${f.id==i.fid?"selected":""}>${esc(path(f.id))}</option>`).join("")}</select></div>
+<div><label>Title</label><input type="text" id="f1" value="${esc(i.title)}"></div><div><label>Username</label><input type="text" id="f2" value="${esc(i.username)}"></div>
+<div><label>Password</label><input type="text" id="f3" value="${esc(i.password)}" oninput="$('#m').innerHTML=meter(this.value)"></div><div id="m">${meter(i.password)}</div>
+<div class="card"><div class="opt"><b>Generator</b><span class="mu">Length <span id="ln">20</span></span></div><input type="range" id="len" min="8" max="64" value="20" oninput="$('#ln').textContent=this.value">
+${[["lower","a–z"],["upper","A–Z"],["digits","0–9"],["symbols","Symbols"],["amb","Avoid ambiguous (l, 1, O, 0)"]].map(([k,t])=>`<div class="opt"><span>${t}</span><input type="checkbox" id="g_${k}" checked></div>`).join("")}
+<button class="pri" style="width:100%;margin-top:8px" onclick="doGen()">Generate password</button><div class="err" id="ge"></div></div>
+<div><label>Website</label><input type="text" id="f4" value="${esc(i.website)}"></div><div><label>Notes</label><textarea id="f5" rows="3">${esc(i.notes)}</textarea></div>`}
+else if(S.scr=="folder"){const f=S.fe;h=`<div class="row sp"><button class="ico" onclick="go('browse')">✕ Cancel</button><h2>${f.id?"Edit":"New"} ${f.p?"sub-vault":"vault"}</h2><button class="ico" onclick="saveF()">Save</button></div>
+${f.p?`<div class="crumb">Inside: ${esc(path(f.p))}</div>`:""}<div><label>Name</label><input type="text" id="fn" value="${esc(f.name)}" placeholder="e.g. Instagram"></div>
+<div><label>Icon</label><div class="ic">${ICONS.map(x=>`<button class="${x==f.icon?"on":""}" onclick="S.fe.icon='${x}';document.querySelectorAll('.ic button').forEach(b=>b.classList.toggle('on',b.textContent=='${x}'))">${x}</button>`).join("")}</div></div>
+<div class="err" id="e"></div>${f.id?`<button class="sec" style="color:var(--bad)" onclick="delF()">Delete (with everything inside)</button>`:""}`}
+else if(S.scr=="settings")h=`<div class="row sp"><button class="ico" onclick="go('browse')">← Back</button><h2>Appearance</h2><span></span></div>
+<div><label>Theme</label><div class="seg">${["system","light","dark"].map(m=>`<button class="${S.mode==m?"on":""}" onclick="S.mode='${m}';theme();render()">${m[0].toUpperCase()+m.slice(1)}</button>`).join("")}</div></div>
+<div><label>Accent colour</label><div class="sw">${Object.keys(ACC).map(n=>`<button title="${n}" class="${S.acc==n?"on":""}" style="background:${ACC[n][dark?0:1]}" onclick="S.acc='${n}';theme();render()"></button>`).join("")}</div></div>
+<div class="card mu">Preview: <b style="color:var(--ac)">${S.acc}</b> accent in ${dark?"dark":"light"} mode.</div>`;
+el.innerHTML=h;[...el.children].forEach((c,i)=>c.style.setProperty("--i",i));if(S.scr!="browse"||!S.q)el.scrollTop=0}
+const KEY="vl_vault_v1",enc=new TextEncoder,dec=new TextDecoder,VER="vaultlock-verify-v1";
+const b64=u=>{let t="";for(const x of u)t+=String.fromCharCode(x);return btoa(t)},ub=t=>Uint8Array.from(atob(t),c=>c.charCodeAt(0));
+async function dk(pw,salt,it){const m=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:it,hash:"SHA-256"},m,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function seal(k,u8){const n=crypto.getRandomValues(new Uint8Array(12)),c=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv:n},k,u8)),o=new Uint8Array(12+c.length);o.set(n);o.set(c,12);return b64(o)}
+async function unseal(k,t){const u=ub(t);return new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM",iv:u.slice(0,12)},k,u.slice(12)))}
+function persist(){if(!S.key)return;const k=S.key,d=enc.encode(JSON.stringify({FL:S.FL,items:S.items}));S.pq=(S.pq||Promise.resolve()).then(async()=>{const v=JSON.parse(localStorage[KEY]);v.data=await seal(k,d);localStorage[KEY]=JSON.stringify(v)}).catch(()=>toast("Could not save"))}
+async function setup(){const a=$("#p1").value,r=reject(a,$("#p2").value);if(r){$("#e").textContent=r;return}
+$("#e").textContent="";const salt=crypto.getRandomValues(new Uint8Array(16)),it=200000;S.key=await dk(a,salt,it);
+S.FL=[["Social Media","👥"],["Work","💼"],["Finance","💰"],["Personal","🏠"]].map((x,i)=>({id:i+1,name:x[0],icon:x[1],p:0}));S.items=[];
+localStorage[KEY]=JSON.stringify({salt:b64(salt),it,ver:await seal(S.key,enc.encode(VER)),data:""});go("browse")}
+async function unlock(){const v=JSON.parse(localStorage[KEY]);$("#e").textContent="";try{const k=await dk($("#p1").value,ub(v.salt),v.it);
+if(dec.decode(await unseal(k,v.ver))!==VER)throw 0;const d=v.data?JSON.parse(dec.decode(await unseal(k,v.data))):{FL:[],items:[]};S.key=k;S.FL=d.FL;S.items=d.items;S.cur=0;S.q="";go("browse")}catch(e){$("#e").textContent="Wrong master password."}}
+function lock(){S.key=null;S.items=[];S.FL=[];S.cur=0;S.q="";go("unlock")}
+document.addEventListener("visibilitychange",()=>{if(document.hidden)S.hid=Date.now();else if(S.key&&S.hid&&Date.now()-S.hid>30000)lock()});
+function init(){try{const p=JSON.parse(localStorage.vl_prefs||"{}");S.mode=["system","light","dark"].includes(p.mode)?p.mode:"system";S.acc=ACC[p.acc]?p.acc:"Violet"}catch(e){}S.scr=localStorage[KEY]?"unlock":"setup";theme();render()}
+function doGen(){const g=k=>$("#g_"+k).checked,p=gen({len:+$("#len").value,lower:g("lower"),upper:g("upper"),digits:g("digits"),symbols:g("symbols"),amb:g("amb")});if(!p){$("#ge").textContent="Choose at least one character set";return}$("#ge").textContent="";$("#f3").value=p;$("#m").innerHTML=meter(p)}
+function save(){const d={fid:+$("#f0").value,title:$("#f1").value.trim()||"Untitled",username:$("#f2").value,password:$("#f3").value,website:$("#f4").value,notes:$("#f5").value};S.cur=d.fid;
+if(S.sel){Object.assign(S.items.find(x=>x.id==S.sel),d);go("detail")}else{S.items.push({id:Date.now(),...d});go("browse")}}
+function newF(){S.fe={id:0,p:S.cur,name:"",icon:"📁"};go("folder")}
+function editF(id){const f=fo(id);S.fe={...f};go("folder")}
+function saveF(){const n=$("#fn").value.trim();if(!n){$("#e").textContent="Give it a name.";return}S.fe.name=n;
+if(S.fe.id)Object.assign(fo(S.fe.id),S.fe);else{S.fe.id=Date.now();S.FL.push(S.fe);S.cur=S.fe.id}go("browse")}
+function delF(){const ids=desc(S.fe.id),p=S.fe.p;S.FL=S.FL.filter(f=>!ids.includes(f.id));S.items=S.items.filter(i=>!ids.includes(i.fid));S.cur=p;go("browse")}
+init();
+</script></body></html>
